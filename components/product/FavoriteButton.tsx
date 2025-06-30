@@ -7,21 +7,22 @@ export default function FavoriteButton({ productId }: { productId: string }) {
   const [isFavorited, setIsFavorited] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchStatus = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUserId(user.id)
-        const { data } = await supabase
-          .from('favorites')
-          .select()
-          .eq('user_id', user.id)
-          .eq('product_id', productId)
-        setIsFavorited(data?.length > 0)
-      }
+useEffect(() => {
+  const fetchStatus = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      setUserId(user.id)
+      const { data } = await supabase
+        .from('favorites')
+        .select()
+        .eq('user_id', user.id)
+        .eq('product_id', productId)
+
+      setIsFavorited((data ?? []).length > 0)
     }
-    fetchStatus()
-  }, [productId])
+  }
+  fetchStatus()
+}, [productId])
 
   const toggleFavorite = async () => {
   if (!userId) return alert('Login dulu ya!')

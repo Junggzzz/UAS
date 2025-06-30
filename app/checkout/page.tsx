@@ -39,9 +39,8 @@ export default function CheckoutPage() {
       )
 
       const filtered = (cart || []).filter(item =>
-        selectedCart.some(sel => sel.id === item.id)
+      selectedCart.some((sel: any) => sel.id === item.id)
       )
-
       setAlamat(profile?.alamat || '')
       setCartItems(filtered)
       setLoading(false)

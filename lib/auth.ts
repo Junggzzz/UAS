@@ -1,17 +1,34 @@
-// lib/auth.ts (atau di mana kamu tangani auth)
 import { supabase } from './supabase'
 
-export async function registerUser({ email, password, nama, alamat, nomor_hp }) {
+interface RegisterParams {
+  email: string
+  password: string
+  nama: string
+  alamat: string
+  nomor_hp: string
+}
+
+export async function registerUser({
+  email,
+  password,
+  nama,
+  alamat,
+  nomor_hp
+}: RegisterParams) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password
   })
 
-  if (error) return { error }
+  if (error) {
+    return { error }
+  }
 
   const user = data.user
+  if (!user) {
+    return { error: { message: 'User belum terverifikasi.' } }
+  }
 
-  // Insert ke tabel profiles
   const { error: profileError } = await supabase.from('profiles').insert([
     {
       id: user.id,
@@ -21,7 +38,9 @@ export async function registerUser({ email, password, nama, alamat, nomor_hp }) 
     }
   ])
 
-  if (profileError) return { error: profileError }
+  if (profileError) {
+    return { error: profileError }
+  }
 
   return { user }
 }

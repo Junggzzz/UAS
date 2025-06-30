@@ -10,15 +10,43 @@ export default function EditProfilePage() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-      if (data) setForm({ nama: data.nama, alamat: data.alamat, nomor_hp: data.nomor_hp })
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        router.push('/login')
+        return
+      }
+
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (data) {
+        setForm({
+          nama: data.nama,
+          alamat: data.alamat,
+          nomor_hp: data.nomor_hp,
+        })
+      }
     }
+
     fetchProfile()
-  }, [])
+  }, [router])
 
   const handleSave = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      alert('Kamu belum login.')
+      return
+    }
+
     await supabase.from('profiles').update(form).eq('id', user.id)
     alert('Data berhasil diperbarui')
     router.push('/dashboard')
@@ -27,11 +55,36 @@ export default function EditProfilePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F9F1E7] p-6">
       <div className="bg-white shadow-lg p-10 rounded w-full max-w-lg">
-        <h1 className="text-3xl font-bold text-[#B88E2F] mb-6 text-center">Edit Profil</h1>
-        <input name="nama" placeholder="Nama" className="w-full border p-2 mb-4 rounded text-black" value={form.nama} onChange={e => setForm({ ...form, nama: e.target.value })} />
-        <input name="alamat" placeholder="Alamat" className="w-full border p-2 mb-4 rounded text-black" value={form.alamat} onChange={e => setForm({ ...form, alamat: e.target.value })} />
-        <input name="nomor_hp" placeholder="Nomor HP" className="w-full border p-2 mb-6 rounded text-black" value={form.nomor_hp} onChange={e => setForm({ ...form, nomor_hp: e.target.value })} />
-        <button onClick={handleSave} className="bg-[#B88E2F] text-white w-full py-2 rounded hover:bg-[#a17825]">Simpan</button>
+        <h1 className="text-3xl font-bold text-[#B88E2F] mb-6 text-center">
+          Edit Profil
+        </h1>
+        <input
+          name="nama"
+          placeholder="Nama"
+          className="w-full border p-2 mb-4 rounded text-black"
+          value={form.nama}
+          onChange={(e) => setForm({ ...form, nama: e.target.value })}
+        />
+        <input
+          name="alamat"
+          placeholder="Alamat"
+          className="w-full border p-2 mb-4 rounded text-black"
+          value={form.alamat}
+          onChange={(e) => setForm({ ...form, alamat: e.target.value })}
+        />
+        <input
+          name="nomor_hp"
+          placeholder="Nomor HP"
+          className="w-full border p-2 mb-6 rounded text-black"
+          value={form.nomor_hp}
+          onChange={(e) => setForm({ ...form, nomor_hp: e.target.value })}
+        />
+        <button
+          onClick={handleSave}
+          className="bg-[#B88E2F] text-white w-full py-2 rounded hover:bg-[#a17825]"
+        >
+          Simpan
+        </button>
       </div>
     </div>
   )
