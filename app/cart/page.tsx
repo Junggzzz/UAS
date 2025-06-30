@@ -34,10 +34,10 @@ export default function CartPage() {
         .select('id, name, price, image_url')
         .in('id', productIds)
 
-      const combined = (cartData ?? []).map((item) => ({
-        ...item,
-        product: products.find((p) => p.id === item.product_id),
-      }))
+const combined = cartData.map((item) => ({
+  ...item,
+  product: (products ?? []).find((p) => p.id === item.product_id),
+}))
 
       setCart(combined)
     }
